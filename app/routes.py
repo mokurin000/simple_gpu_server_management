@@ -76,10 +76,13 @@ def dashboard():
 
         ssh.connect(domain, port=port, username=user, password=password)
 
-        cmd = f"sudo python3 -c '{NETWORK_SPEED}' 1 lo wan dae docker"
-        _, stdout, _ = ssh.exec_command(cmd)
+        cmd = f"/root/miniconda3/bin/python -c '{NETWORK_SPEED}' 1.0 lo"
+        _, stdout, stderr = ssh.exec_command(cmd)
         output = stdout.read().decode()
-        server.__setattr__("network_speed", output.strip())
+        error = stderr.read().decode()
+        if error:
+            print(f"error: {error}")
+        server.__setattr__("network_speed", output.strip() or "N/A")
 
     for server in servers:
         gpu_info = update_server_gpu_info(server)  # 调用 update_server_gpu_info 函数

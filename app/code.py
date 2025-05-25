@@ -1,5 +1,4 @@
-NETWORK_SPEED = """
-from os import geteuid, listdir
+NETWORK_SPEED = """from os import geteuid, listdir
 from sys import stderr, argv
 from multiprocessing import Pool
 from functools import partial

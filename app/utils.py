@@ -1,4 +1,6 @@
-import paramiko  # 新引入一个包
+import paramiko
+
+from app.models import Server  # 新引入一个包
 
 
 def get_gpu_info(domain, port, user, password):
@@ -105,7 +107,7 @@ def get_gpu_info(domain, port, user, password):
         return None
 
 
-def update_server_gpu_info(server):
+def update_server_gpu_info(server: Server):
     if server.domain:
         print("服务器信息:", server.domain)
         gpu_info = get_gpu_info(

@@ -27,7 +27,7 @@ def create_app(config_class=Config):
     login_manager.login_view = "login"
 
     with app.app_context():
-        from app import models
+        from app import models, routes as _  # noqa: F401, load routes
 
         db.create_all()
 
