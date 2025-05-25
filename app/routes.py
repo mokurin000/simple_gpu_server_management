@@ -1,4 +1,4 @@
-from flask import render_template, redirect, url_for, flash, request
+from flask import jsonify, render_template, redirect, url_for, flash, request
 from flask_login import login_user, logout_user, login_required, current_user
 from app import db
 from app.models import User, Server, gpu_usage_history, gpu_info
@@ -15,6 +15,8 @@ from app.utils import update_server_gpu_info
 from datetime import datetime, timedelta
 import pytz
 
+from app.code import NETWORK_SPEED
+import paramiko
 
 @app.route("/")
 def index():
@@ -55,34 +57,40 @@ def register():
     return render_template("register.html", title="注册", form=form)
 
 
+@app.route("/get_network_speed/<int:server_id>", methods=["GET"])
+@login_required
+def get_network_speed(server_id):
+    server: Server = Server.query.get_or_404(server_id)
+    ssh = paramiko.SSHClient()
+    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+
+    try:
+        ssh.connect(
+            server.domain,
+            port=server.port,
+            username=server.user,
+            password=server.password,
+        )
+        cmd = f"/root/miniconda3/bin/python -c '{NETWORK_SPEED}' 1.0 lo"
+        _, stdout, stderr = ssh.exec_command(cmd)
+        output = stdout.read().decode().strip()
+        error = stderr.read().decode().strip()
+
+        if error:
+            return jsonify({"speed": f"Error: {error}"}), 500
+        return jsonify({"speed": output or "N/A"})
+
+    except Exception as e:
+        return jsonify({"speed": f"Connection Error: {str(e)}"}), 500
+    finally:
+        ssh.close()
+
+
 @app.route("/dashboard", methods=["GET", "POST"])
 @login_required
 def dashboard():
-    from app.code import NETWORK_SPEED
-
-    import paramiko
-
     servers: list[Server] = Server.query.all()
     detailed_gpu_info = {}  # 用于存储每个服务器的详细GPU信息
-
-    for server in servers:
-        ssh = paramiko.SSHClient()
-        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-
-        domain = server.domain
-        port = server.port
-        user = server.user
-        password = server.password
-
-        ssh.connect(domain, port=port, username=user, password=password)
-
-        cmd = f"/root/miniconda3/bin/python -c '{NETWORK_SPEED}' 1.0 lo"
-        _, stdout, stderr = ssh.exec_command(cmd)
-        output = stdout.read().decode()
-        error = stderr.read().decode()
-        if error:
-            print(f"error: {error}")
-        server.__setattr__("network_speed", output.strip() or "N/A")
 
     for server in servers:
         gpu_info = update_server_gpu_info(server)  # 调用 update_server_gpu_info 函数

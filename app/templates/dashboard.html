@@ -89,9 +89,7 @@
                         N/A
                         {% endif %}
                     </td>
-                    <td>
-                        {{ server.network_speed }}
-                    </td>
+                    <td id="speed-{{ server.id }}">Loading...</td>
                     <td>{{ '已分配' if server.is_occupied else '未分配' }}</td>
                     <td>{{ server.occupied_by.username if server.occupied_by else 'N/A' }}</td>
                     <td>{{ server.note or 'N/A' }}</td>
@@ -228,6 +226,26 @@
     {% endfor %}
 
     <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // 为每个服务器创建定时更新
+        {% for server in servers %}
+        (function(serverId) {
+            setInterval(() => {
+                fetch(`/get_network_speed/${serverId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById(`speed-${serverId}`).textContent = data.speed;
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        document.getElementById(`speed-${serverId}`).textContent = 'Error';
+                    });
+            }, 5000);
+        })({{ server.id }});
+        {% endfor %}
+    });
+    </script>
 </body>
 
 </html>
