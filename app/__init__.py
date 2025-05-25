@@ -69,7 +69,8 @@ def create_app(config_class=Config):
 
         scheduler.add_job(
             func=scheduled_update,
-            trigger=IntervalTrigger(minutes=1),
+            # this trigger sometimes trigger two tasks in very short time (e.g. 3s)
+            trigger=IntervalTrigger(seconds=5),
             id="update_gpu_info",
             name="Check and update GPU info",
             replace_existing=True,
