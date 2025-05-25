@@ -36,6 +36,28 @@
                     {{ form.ip(class="form-control", placeholder="10.1.1.2 或 10.1.1.2-4") }}
                     <small class="form-text text-muted">对于多服务器注册，使用范围（如 10.1.1.2-4）</small>
                 </div>
+                <!-- 新增密码等三个输入框 -->
+                <div class="col-md-4 mb-3">
+                    <label for="password" class="form-label">SSH密码</label>
+                    <input type="password" id="password" name="password" class="form-control" placeholder="输入SSH密码" required>
+                    <small class="form-text text-muted">用于SSH连接的密码</small>
+                </div>
+                <!-- 域名输入框 -->
+                <div class="col-md-4 mb-3">
+                    <label for="domain" class="form-label">域名</label>
+                    <input type="text" id="domain" name="domain" class="form-control" placeholder="输入域名">
+                    <small class="form-text text-muted">用于SSH连接的域名</small>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="port" class="form-label">端口</label>
+                    <input type="number" id="port" name="port" class="form-control" placeholder="输入端口" required>
+                    <small class="form-text text-muted">用于SSH连接的端口</small>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="user" class="form-label">用户名</label>
+                    <input type="text" id="user" name="user" class="form-control" placeholder="输入用户名" required>
+                    <small class="form-text text-muted">用于SSH连接的用户名</small>
+                </div>
                 <div class="col-md-4 mb-3 d-flex align-items-end">
                     {{ form.submit(class="btn btn-primary") }}
                 </div>

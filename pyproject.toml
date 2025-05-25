@@ -1,0 +1,15 @@
+[project]
+name = "simple-gpu-server-management"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "apscheduler==3.10.4",
+    "flask-login==0.6.3",
+    "flask-migrate==4.0.7",
+    "flask-wtf>=1.2.2",
+    "paramiko>=3.5.1",
+    "pytz==2024.2",
+    "sqlalchemy==2.0.35",
+]

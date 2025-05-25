@@ -6,7 +6,6 @@
     <title>{{ title }} - GPU服务器管理系统</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
     <script src="{{ url_for('static', filename='js/chart.js') }}"></script>
-    <!-- <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> -->
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
@@ -40,36 +39,65 @@
             </div>
         </div>
 
+        <!-- GPU 详细信息 -->
         <h2>GPU 详细信息</h2>
         <table class="table table-striped">
             <thead>
                 <tr>
                     <th>GPU 索引</th>
+                    <th>显存使用</th>
+                    <th>显存总量</th>
                     <th>显存使用率</th>
                     <th>GPU 利用率</th>
-                    <th>进程名</th>
-                    <th>进程 ID</th>
+                    <th>当前功耗</th>
+                    <th>最大功耗</th>
+                    <th>功耗使用率</th>
+                    <th>进程信息</th>
                 </tr>
             </thead>
             <tbody>
                 {% for gpu in gpu_info %}
                 <tr>
                     <td>{{ gpu.gpu_index }}</td>
+                    <td>{{ gpu.memory_used|round(2) }} MB</td>
+                    <td>{{ gpu.memory_total|round(2) }} MB</td>
                     <td>{{ gpu.memory_usage|round(2) }}%</td>
                     <td>{{ gpu.utilization|round(2) }}%</td>
-                    <td>{{ gpu.process_name or 'N/A' }}</td>
-                    <td>{{ gpu.process_id or 'N/A' }}</td>
+                    <td>{{ gpu.power_draw|round(2) }} W</td>
+                    <td>{{ gpu.power_limit|round(2) }} W</td>
+                    <td>{{ gpu.power_usage|round(2) }}%</td>
+                    <td>
+                        <!-- 嵌套表展示进程信息 -->
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>进程 ID</th>
+                                    <th>显存使用 (MB)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for process in gpu.processes %}
+                                <tr>
+                                    <td>{{ process.pid }}</td>
+                                    <td>{{ process.used_memory|round(2) }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
 
+        <!-- GPU 使用率历史 -->
         <h2>GPU 使用率历史</h2>
         <canvas id="gpuUsageChart"></canvas>
 
         <a href="{{ url_for('dashboard') }}" class="btn btn-primary mt-3">返回仪表板</a>
     </div>
 
+    <!-- 图表脚本 -->
     <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -99,3 +127,7 @@
     </script>
 </body>
 </html>
+
+
+
+

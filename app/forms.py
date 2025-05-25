@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, DateTimeField, SelectMultipleField
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, DateTimeField, SelectMultipleField,IntegerField
 from wtforms.validators import DataRequired, Length, EqualTo, ValidationError, IPAddress
 from app.models import User
 import re
@@ -22,9 +22,48 @@ class RegistrationForm(FlaskForm):
 
 class ServerForm(FlaskForm):
     name = StringField('服务器名', validators=[DataRequired()])
-    ip = StringField('IP地址', validators=[DataRequired()])
+    ip = StringField('IP地址')  # 移除 DataRequired 验证器
+    domain = StringField('域名')  # 移除 DataRequired 验证器
+    port = IntegerField('端口', validators=[DataRequired()])
+    user = StringField('用户名', validators=[DataRequired()])
+    password = PasswordField('SSH密码', validators=[DataRequired()])
     submit = SubmitField('添加服务器')
-
+    """
+    def validate(self):
+        if not super().validate():
+            return False
+        if not self.ip.data and not self.domain.data:
+            #flash('IP地址或域名至少填写一个。', 'danger')
+            return False
+        return True
+    """
+class ServerManagementForm(FlaskForm):
+    name = StringField('服务器名', validators=[DataRequired()])
+    ip = StringField('IP地址')  # 移除 DataRequired 验证器
+    domain = StringField('域名')  # 移除 DataRequired 验证器
+    port = IntegerField('端口', validators=[DataRequired()])
+    user = StringField('用户名', validators=[DataRequired()])
+    password = PasswordField('SSH密码', validators=[DataRequired()])
+    submit = SubmitField('添加服务器')
+    """
+    def validate(self):
+        if not super().validate():
+            return False
+        if not self.ip.data and not self.domain.data:
+            #flash('IP地址或域名至少填写一个。', 'danger')
+            return False
+        return True
+    """
+"""
+class ServerForm(FlaskForm):
+    name = StringField('服务器名', validators=[DataRequired()])
+    ip = StringField('IP地址', validators=[DataRequired()])
+    domain = StringField('域名', validators=[DataRequired()])  # 添加域名字段
+    port = IntegerField('端口', validators=[DataRequired()])  # 新增端口字段
+    user = StringField('用户名', validators=[DataRequired()])  # 新增用户名字段
+    password = PasswordField('SSH密码', validators=[DataRequired()])  # 新增密码字段
+    submit = SubmitField('添加服务器')
+"""
 class OccupyServerForm(FlaskForm):
     servers = SelectMultipleField('选择服务器', coerce=int, validators=[DataRequired()])
     note = StringField('备注')
@@ -36,15 +75,20 @@ class UserManagementForm(FlaskForm):
     password = PasswordField('密码', validators=[DataRequired()])
     is_admin = BooleanField('管理员权限')
     submit = SubmitField('添加/更新用户')
-
+    
     def validate_username(self, username):
         user = User.query.filter_by(username=username.data).first()
         if user and self.password.data:
             raise ValidationError('该用户名已存在，如果要更新用户，请留空密码字段。')
-
+    
+"""
 class ServerManagementForm(FlaskForm):
     name = StringField('服务器名', validators=[DataRequired()])
     ip = StringField('IP地址', validators=[DataRequired()])
+    domain = StringField('域名', validators=[DataRequired()])  # 添加域名字段
+    port = IntegerField('端口', validators=[DataRequired()])  # 新增端口字段
+    user = StringField('用户名', validators=[DataRequired()])  # 新增用户名字段
+    password = PasswordField('SSH密码', validators=[DataRequired()])  # 新增密码字段
     submit = SubmitField('添加服务器')
 
     def validate_ip(self, ip):
@@ -72,3 +116,4 @@ class ServerManagementForm(FlaskForm):
             start = ip.data.rsplit('.', 1)[0].split('.')[-1]
             if int(start) >= int(end):
                 raise ValidationError('IP地址范围的起始值必须小于结束值。')
+"""
