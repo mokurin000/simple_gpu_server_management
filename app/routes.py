@@ -58,8 +58,28 @@ def register():
 @app.route("/dashboard", methods=["GET", "POST"])
 @login_required
 def dashboard():
-    servers = Server.query.all()
+    from app.code import NETWORK_SPEED
+
+    import paramiko
+
+    servers: list[Server] = Server.query.all()
     detailed_gpu_info = {}  # 用于存储每个服务器的详细GPU信息
+
+    for server in servers:
+        ssh = paramiko.SSHClient()
+        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+
+        domain = server.domain
+        port = server.port
+        user = server.user
+        password = server.password
+
+        ssh.connect(domain, port=port, username=user, password=password)
+
+        cmd = f"sudo python3 -c '{NETWORK_SPEED}' 1 lo wan dae docker"
+        _, stdout, _ = ssh.exec_command(cmd)
+        output = stdout.read().decode()
+        server.__setattr__("network_speed", output.strip())
 
     for server in servers:
         gpu_info = update_server_gpu_info(server)  # 调用 update_server_gpu_info 函数
