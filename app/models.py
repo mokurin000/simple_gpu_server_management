@@ -1,7 +1,6 @@
 from app import db
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
-from datetime import datetime
 from sqlalchemy.dialects.sqlite import JSON
 
 class User(UserMixin, db.Model):
@@ -43,47 +42,6 @@ class gpu_usage_history(db.Model):
     timestamp = db.Column(db.DateTime, nullable=False)
     usage = db.Column(db.Float, nullable=False)
 
-"""
-class gpu_info(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    server_id = db.Column(db.Integer, db.ForeignKey('server.id'))
-    gpu_index = db.Column(db.Integer, nullable=False)
-    memory_usage = db.Column(db.Float)
-    utilization = db.Column(db.Float)
-    #power_draw = db.Column(db.Float)          # 当前功耗
-    #power_limit = db.Column(db.Float)         # 最大功耗
-    #power_usage = db.Column(db.Float)         # 功率使用率
-    process_name = db.Column(db.String(128))
-    process_id = db.Column(db.Integer)
-    #process_gpu_memory = db.Column(db.Float)  # 进程使用的 GPU 内存
-"""
-"""
-class gpu_info(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    server_id = db.Column(db.Integer, db.ForeignKey('server.id'))
-    gpu_index = db.Column(db.Integer, nullable=False)
-    memory_usage = db.Column(db.Float)
-    memory_used = db.Column(db.Float)
-    memory_total = db.Column(db.Float)
-    utilization = db.Column(db.Float)
-    power_draw = db.Column(db.Float)          # 当前功耗
-    power_limit = db.Column(db.Float)         # 最大功耗
-    power_usage = db.Column(db.Float)         # 功率使用率
-    # 进程信息不再直接存储在 gpu_info 中，而是通过 gpu_process 表关联
-
-    # 建立与 gpu_process 的关系
-    processes = db.relationship('gpu_process', backref='gpu', lazy=True)
-
-    # 添加唯一约束，确保同一服务器上 GPU 索引唯一
-    __table_args__ = (db.UniqueConstraint('server_id', 'gpu_index', name='unique_gpu_per_server'),)
-
-
-class gpu_process(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    gpu_id = db.Column(db.Integer, db.ForeignKey('gpu_info.id'), nullable=False)
-    pid = db.Column(db.Integer, nullable=False)
-    used_memory = db.Column(db.Float, nullable=False)
-"""
 class gpu_info(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     server_id = db.Column(db.Integer, db.ForeignKey('server.id'))

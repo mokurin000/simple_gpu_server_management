@@ -1,6 +1,6 @@
 from app import db
 from app.models import Server, gpu_info, gpu_usage_history
-from app.utils import update_server_gpu_info, get_gpu_info
+from app.utils import update_server_gpu_info
 from flask import current_app
 from datetime import datetime
 import pytz
